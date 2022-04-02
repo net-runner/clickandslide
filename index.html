@@ -1,567 +1,673 @@
 <!DOCTYPE html>
 <html lang="pl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="css.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Black+Han+Sans|Righteous" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="css.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Black+Han+Sans|Righteous"
+      rel="stylesheet"
+    />
     <title>Click & Slide</title>
-</head>
+  </head>
 
-<body>
-
-</body>
-<script>
+  <body></body>
+  <script>
     document.addEventListener("DOMContentLoaded", function (e) {
-        console.log("PAGE READY")
-        console.log(document.cookie)
+      console.log("PAGE READY");
+      console.log(document.cookie);
     });
     var ClickNSlide = {
-        array: [],
-        anim_counter: 0,
-        thevalue: 3,
-        time: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        imgs: ["pic5.png", "kaczuchaXpies.png", "obi2.jpg", "sstalinNbalin.png", "giphy.gif", "pic5.png", "kaczuchaXpies.png"],
-        numbers: ["0.png", "1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png"],
-        img_index: 1,
-        win_string: "",
-        player_turns: [0, 0, 0, 0],
-        startDate: 0,
-        step_counter: 0,
-        roll_in_progress: false,
-        genTab: function (width) {
-            tab = []
-            for (let i = 0; i < width; i++) {
-                tab[i] = []
-                for (let x = 0; x < width; x++) {
-                    tab[i][x] = 0
-                }
+      array: [],
+      anim_counter: 0,
+      thevalue: 3,
+      time: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      imgs: [
+        "pic5.png",
+        "kaczuchaXpies.png",
+        "obi2.jpg",
+        "stalinNbalin.png",
+        "giphy.gif",
+        "pic5.png",
+        "kaczuchaXpies.png",
+      ],
+      numbers: [
+        "0.png",
+        "1.png",
+        "2.png",
+        "3.png",
+        "4.png",
+        "5.png",
+        "6.png",
+        "7.png",
+        "8.png",
+        "9.png",
+      ],
+      img_index: 1,
+      win_string: "",
+      player_turns: [0, 0, 0, 0],
+      startDate: 0,
+      step_counter: 0,
+      roll_in_progress: false,
+      genTab: function (width) {
+        tab = [];
+        for (let i = 0; i < width; i++) {
+          tab[i] = [];
+          for (let x = 0; x < width; x++) {
+            tab[i][x] = 0;
+          }
+        }
+        return tab;
+      },
+      genTable: function (val) {
+        if (!ClickNSlide.roll_in_progress) {
+          ClickNSlide.step_counter = 0;
+          ClickNSlide.win_string = "";
+          value = this.value;
+          ClickNSlide.thevalue = value;
+          ClickNSlide.array = ClickNSlide.genTab(
+            parseInt(ClickNSlide.thevalue) + 2
+          );
+          let playarea = document.getElementById("playarea");
+          playarea.innerHTML = "";
+          table = document.createElement("div");
+          table.setAttribute("id", "table");
+          for (let x = 0; x < value; x++) {
+            let tr = document.createElement("div");
+            tr.classList.add("row");
+            for (let y = 0; y < value; y++) {
+              h = 60 / value;
+              var ii = x + 1,
+                xx = y + 1;
+              let td = document.createElement("div");
+              td.classList.add("td");
+              td.classList.add(x + 1);
+              td.classList.add(y + 1);
+              td.style.height = h + "vh";
+              td.style.width = h + "vh";
+              td.setAttribute("id", "c" + ii + "." + xx);
+              if (x == value - 1 && y == value - 1) {
+                td.classList.add("blck");
+              } else {
+                td.style.backgroundImage =
+                  "url(" + ClickNSlide.imgs[ClickNSlide.img_index] + ")";
+                td.style.backgroundRepeat = "no-repeat";
+                td.style.backgroundSize = "60vh";
+                td.style.backgroundPosition =
+                  (100 / (value - 1)) * y + "%" + (100 / (value - 1)) * x + "%";
+              }
+              tr.appendChild(td);
             }
-            return tab;
-        },
-        genTable: function (val) {
-            if (!ClickNSlide.roll_in_progress) {
-                ClickNSlide.step_counter = 0;
-                ClickNSlide.win_string = "";
-                value = this.value;
-                ClickNSlide.thevalue = value;
-                ClickNSlide.array = ClickNSlide.genTab(parseInt(ClickNSlide.thevalue) + 2);
-                let playarea = document.getElementById("playarea");
-                playarea.innerHTML = "";
-                table = document.createElement("div");
-                table.setAttribute("id", "table");
-                for (let x = 0; x < value; x++) {
-                    let tr = document.createElement("div");
-                    tr.classList.add("row");
-                    for (let y = 0; y < value; y++) {
-                        h = 60 / value;
-                        var ii = x + 1, xx = y + 1;
-                        let td = document.createElement("div");
-                        td.classList.add("td");
-                        td.classList.add(x + 1)
-                        td.classList.add(y + 1)
-                        td.style.height = h + "vh";
-                        td.style.width = h + "vh";
-                        td.setAttribute("id", "c" + (ii) + "." + (xx));
-                        if (x == value - 1 && y == value - 1) {
-                            td.classList.add("blck");
-                        }
-                        else {
-                            td.style.backgroundImage = "url(" + ClickNSlide.imgs[ClickNSlide.img_index] + ")";
-                            td.style.backgroundRepeat = 'no-repeat';
-                            td.style.backgroundSize = "60vh";
-                            td.style.backgroundPosition = ((100 / (value - 1)) * y) + "%" + ((100 / (value - 1)) * x) + "%";
-                        }
-                        tr.appendChild(td);
-                    }
-                    table.appendChild(tr);
-                }
-                playarea.appendChild(table);
-                ClickNSlide.win_string = ClickNSlide.gen_win_string(table.getElementsByClassName("td"));
-                ClickNSlide.stop();
-                ClickNSlide.rollboard();
-                ClickNSlide.clear_stepper()
-                ClickNSlide.clear_timer()
+            table.appendChild(tr);
+          }
+          playarea.appendChild(table);
+          ClickNSlide.win_string = ClickNSlide.gen_win_string(
+            table.getElementsByClassName("td")
+          );
+          ClickNSlide.stop();
+          ClickNSlide.rollboard();
+          ClickNSlide.clear_stepper();
+          ClickNSlide.clear_timer();
+        }
+      },
+      genHtml: function () {
+        document.body.addEventListener("keydown", ClickNSlide.__keydown, true);
+        let d_game = document.createElement("div");
+        d_game.addEventListener("contextmenu", ClickNSlide.__contextmenu, true);
+        let d_game_menu = document.createElement("div");
+        let d_game_menu_controls = document.createElement("div");
+        let d_game_menu_image = document.createElement("div");
+        let d_game_playarea = document.createElement("div");
+        ClickNSlide.genButtons(d_game_menu_controls, 1);
+        d_game.setAttribute("id", "gamediv");
+        d_game_menu.setAttribute("id", "menu");
+        d_game_menu_controls.setAttribute("id", "controls");
+        d_game_menu_image.setAttribute("id", "slidero");
+        d_game_menu_image.classList.add("img");
+        d_game_menu.appendChild(d_game_menu_image);
+        d_game_menu.appendChild(d_game_menu_controls);
+        d_game_playarea.setAttribute("id", "playarea");
+        d_game.appendChild(d_game_menu);
+        d_game.appendChild(d_game_playarea);
+        document.body.appendChild(d_game);
+        d_game_menu_image.addEventListener("wheel", ClickNSlide._wheel, true);
+        ClickNSlide.genSlider();
+        ClickNSlide.genTimer();
+        d_game_menu_image.scrollTop =
+          document.getElementsByClassName("imgs")[0].clientHeight;
+      },
+      genSlider: function () {
+        var slidero = document.getElementById("slidero");
+        var target = document.createElement("div");
+        target.setAttribute("id", "slider");
+        slidero.appendChild(target);
+        for (x = 0; x < ClickNSlide.imgs.length; x++) {
+          var div = document.createElement("div");
+          target.appendChild(div);
+          div.classList.add("imgs");
+          div.style.backgroundImage = "url(" + ClickNSlide.imgs[x] + ")";
+        }
+        target.scrollTop = 200;
+      },
+      genTimer: function () {
+        var counter = document.createElement("div");
+        var timero = document.createElement("div");
+        ClickNSlide.drag(counter);
+        var steps = document.createElement("div");
+        counter.appendChild(steps);
+        steps.setAttribute("id", "steps");
+        counter.addEventListener(
+          "contextmenu",
+          ClickNSlide.__contextmenu2,
+          true
+        );
+        timero.setAttribute("id", "timer");
+        counter.setAttribute("id", "counter");
+        for (var i = 0; i < 12; i++) {
+          var x = i;
+          var div = document.createElement("div");
+          timero.appendChild(div);
+          if (i == 2 || i == 5 || i == 8) {
+            div.style.backgroundImage = "url(colon.png)";
+          } else {
+            if (i > 2 && i < 5) {
+              x--;
             }
-        },
-        genHtml: function () {
-            document.body.addEventListener("keydown", ClickNSlide.__keydown, true);
-            let d_game = document.createElement("div");
-            d_game.addEventListener("contextmenu", ClickNSlide.__contextmenu, true);
-            let d_game_menu = document.createElement("div");
-            let d_game_menu_controls = document.createElement("div");
-            let d_game_menu_image = document.createElement("div");
-            let d_game_playarea = document.createElement("div");
-            ClickNSlide.genButtons(d_game_menu_controls, 1);
-            d_game.setAttribute("id", "gamediv");
-            d_game_menu.setAttribute("id", "menu");
-            d_game_menu_controls.setAttribute("id", "controls");
-            d_game_menu_image.setAttribute("id", "slidero");
-            d_game_menu_image.classList.add("img");
-            d_game_menu.appendChild(d_game_menu_image);
-            d_game_menu.appendChild(d_game_menu_controls);
-            d_game_playarea.setAttribute("id", "playarea");
-            d_game.appendChild(d_game_menu);
-            d_game.appendChild(d_game_playarea);
-            document.body.appendChild(d_game);
-            d_game_menu_image.addEventListener("wheel", ClickNSlide._wheel, true);
-            ClickNSlide.genSlider();
-            ClickNSlide.genTimer();
-            d_game_menu_image.scrollTop = document.getElementsByClassName("imgs")[0].clientHeight;
-        },
-        genSlider: function () {
-            var slidero = document.getElementById("slidero");
-            var target = document.createElement("div");
-            target.setAttribute("id", "slider")
-            slidero.appendChild(target)
-            for (x = 0; x < ClickNSlide.imgs.length; x++) {
-                var div = document.createElement("div");
-                target.appendChild(div)
-                div.classList.add("imgs")
-                div.style.backgroundImage = "url(" + ClickNSlide.imgs[x] + ")";
+            if (i > 5 && i < 8) {
+              x -= 2;
             }
-            target.scrollTop = 200;
-
-        },
-        genTimer: function () {
-            var counter = document.createElement("div");
-            var timero = document.createElement("div");
-            ClickNSlide.drag(counter);
-            var steps = document.createElement("div");
-            counter.appendChild(steps);
-            steps.setAttribute("id", "steps");
-            counter.addEventListener("contextmenu", ClickNSlide.__contextmenu2, true);
-            timero.setAttribute("id", "timer");
-            counter.setAttribute("id", "counter");
-            for (var i = 0; i < 12; i++) {
-                var x = i;
-                var div = document.createElement("div");
-                timero.appendChild(div);
-                if (i == 2 || i == 5 || i == 8) {
-                    div.style.backgroundImage = "url(colon.png)";
-                } else {
-                    if (i > 2 && i < 5) { x-- };
-                    if (i > 5 && i < 8) { x -= 2 };
-                    if (i > 8) { x -= 3 };
-                    div.style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")";
-                    div.classList.add("timer");
-                }
+            if (i > 8) {
+              x -= 3;
             }
-            for (var i = 0; i < 4; i++) {
-                var div = document.createElement("div");
-                steps.appendChild(div);
-                div.style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")";
-                div.classList.add("stepper");
+            div.style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")";
+            div.classList.add("timer");
+          }
+        }
+        for (var i = 0; i < 4; i++) {
+          var div = document.createElement("div");
+          steps.appendChild(div);
+          div.style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")";
+          div.classList.add("stepper");
+        }
+        counter.appendChild(timero);
+        document.body.appendChild(counter);
+      },
+      __contextmenu2: function (e) {
+        e.preventDefault();
+        if (this.style.transform == "") {
+          this.style.transform = "rotate(90deg)";
+        } else {
+          this.style.transform = "";
+        }
+      },
+      drag: function (elmnt) {
+        var pos1 = 0,
+          pos2 = 0,
+          pos3 = 0,
+          pos4 = 0;
+        elmnt.onmousedown = dragMouseDown;
+        function dragMouseDown(e) {
+          e = e || window.event;
+          e.preventDefault();
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+        }
+        function elementDrag(e) {
+          e = e || window.event;
+          e.preventDefault();
+          pos1 = pos3 - e.clientX;
+          pos2 = pos4 - e.clientY;
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+          elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+        }
+        function closeDragElement() {
+          document.onmouseup = null;
+          document.onmousemove = null;
+        }
+      },
+      genButtons: function (controls, x) {
+        for (var i = 3; i < 7; i++) {
+          let b = document.createElement("button");
+          b.innerText = i + "x" + i;
+          b.value = i;
+          if (x == 1) {
+            b.addEventListener("click", ClickNSlide.genTable, true);
+          } else {
+            b.addEventListener("click", ClickNSlide.genLbT, true);
+            b.classList.add("bb");
+          }
+          controls.appendChild(b);
+        }
+      },
+      __keydown: function (e) {
+        if (e.keyCode == 82) {
+          document.body.style.background =
+            "linear-gradient(to right, #c31432, #240b36)";
+        }
+        if (e.keyCode == 71) {
+          document.body.style.background =
+            "linear-gradient(to right, #a80077, #66ff00)";
+        }
+        if (e.keyCode == 66) {
+          document.body.style.background =
+            "linear-gradient(to right, #3494e6, #ec6ead)";
+        }
+        if (e.keyCode == 80) {
+          document.body.style.background =
+            "linear-gradient(to right, #ff0099, #493240)";
+        }
+        if (e.keyCode == 87 || e.keyCode == 76) {
+          ClickNSlide.genLb();
+        }
+        if (e.keyCode == 27) {
+          ClickNSlide.escapeClear();
+        }
+      },
+      genLb: function () {
+        console.log("GENE LB");
+        var x = ClickNSlide.alertGen();
+        x[1].classList.add("lb");
+        var divB = document.createElement("div");
+        var divL = document.createElement("div");
+        x[1].appendChild(divB);
+        x[1].appendChild(divL);
+        divB.classList.add("dbl");
+        divL.setAttribute("id", "divL");
+        ClickNSlide.genButtons(divB, 0);
+        ClickNSlide.genLbT(ClickNSlide.thevalue);
+      },
+      genLbT: function (x) {
+        var val = this.value;
+        let css = document.cookie.split("id");
+        css.shift();
+        var cr = [];
+        css.forEach(function (string) {
+          var l = string.split("=");
+          cr.push(l[1]);
+        });
+        var cs = [];
+        cr.forEach(function (string, i) {
+          var l = string.split("|");
+          if (l[0] == val || l[0] == x) l.shift(), cs.push(l);
+        });
+        cs.sort();
+        var target = document.getElementById("divL");
+        target.innerHTML = "";
+        var table = document.createElement("table");
+        for (i = 0; i < 10; i++) {
+          var row = document.createElement("tr");
+          for (var j = 1; j <= 3; j++) {
+            var td = document.createElement("td");
+            if (j == 1) {
+              td.innerText = i + 1;
             }
-            counter.appendChild(timero);
-            document.body.appendChild(counter);
-        },
-        __contextmenu2: function (e) {
-            e.preventDefault();
-            if (this.style.transform == "") {
-                this.style.transform = "rotate(90deg)";
-            } else {
-                this.style.transform = "";
+            if (j == 2) {
+              if (cs[i] == undefined) td.innerText = "--:--:--:--:---";
+              else td.innerText = cs[i][0];
             }
-        },
-        drag: function (elmnt) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            elmnt.onmousedown = dragMouseDown;
-            function dragMouseDown(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
+            if (j == 3) {
+              if (cs[i] == undefined) td.innerText = "----";
+              else
+                td.innerText =
+                  cs[i][1][0] + cs[i][1][1] + cs[i][1][2] + cs[i][1][3];
             }
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
-        },
-        genButtons: function (controls, x) {
-            for (var i = 3; i < 7; i++) {
-                let b = document.createElement("button")
-                b.innerText = i + "x" + i;
-                b.value = i;
-                if (x == 1) {
-                    b.addEventListener("click", ClickNSlide.genTable, true);
-                }
-                else {
-                    b.addEventListener("click", ClickNSlide.genLbT, true);
-                    b.classList.add("bb")
-                }
-                controls.appendChild(b)
-            }
-        },
-        __keydown: function (e) {
-            if (e.keyCode == 82) {
-                document.body.style.background = "linear-gradient(to right, #c31432, #240b36)";
-            }
-            if (e.keyCode == 71) {
-                document.body.style.background = "linear-gradient(to right, #a80077, #66ff00)";
-            }
-            if (e.keyCode == 66) {
-                document.body.style.background = "linear-gradient(to right, #3494e6, #ec6ead)";
-            }
-            if (e.keyCode == 80) {
-                document.body.style.background = "linear-gradient(to right, #ff0099, #493240)";
-            }
-            if (e.keyCode == 87 || e.keyCode == 76) {
-                ClickNSlide.genLb();
-            }
-            if (e.keyCode == 27) {
-                ClickNSlide.escapeClear();
-            }
-        },
-        genLb: function () {
-            console.log("GENE LB")
-            var x = ClickNSlide.alertGen()
-            x[1].classList.add("lb")
-            var divB = document.createElement("div")
-            var divL = document.createElement("div")
-            x[1].appendChild(divB)
-            x[1].appendChild(divL)
-            divB.classList.add("dbl")
-            divL.setAttribute("id", "divL")
-            ClickNSlide.genButtons(divB, 0)
-            ClickNSlide.genLbT(ClickNSlide.thevalue)
-        },
-        genLbT: function (x) {
-            var val = this.value
-            let css = document.cookie.split("id")
-            css.shift()
-            var cr = []
-            css.forEach(function (string) {
-                var l = string.split("=")
-                cr.push(l[1])
-            })
-            var cs = []
-            cr.forEach(function (string, i) {
-                var l = string.split("|")
-                if (l[0] == val || l[0] == x) l.shift(), cs.push(l);
-            })
-            cs.sort()
-            var target = document.getElementById("divL")
-            target.innerHTML = ""
-            var table = document.createElement("table")
-            for (i = 0; i < 10; i++) {
-                var row = document.createElement("tr")
-                for (var j = 1; j <= 3; j++) {
-                    var td = document.createElement("td")
-                    if (j == 1) {
-                        td.innerText = i + 1;
-                    }
-                    if (j == 2) {
-                        if (cs[i] == undefined) td.innerText = "--:--:--:--:---";
-                        else td.innerText = cs[i][0];
-                    }
-                    if (j == 3) {
-                        if (cs[i] == undefined) td.innerText = "----";
-                        else td.innerText = cs[i][1][0] + cs[i][1][1] + cs[i][1][2] + cs[i][1][3];
-                    }
-                    row.appendChild(td)
-                }
-                table.appendChild(row)
-            }
-            target.appendChild(table)
-        },
-        __contextmenu: function (e) {
-            e.preventDefault();
-        },
-        _clicktab: function (e) {
-            let target = e.target;
-            let black = document.getElementsByClassName("blck")[0];
-            let tid = target.getAttribute("id");
-            let x = parseInt(tid[1]);
-            let y = parseInt(tid[3]);
-            ClickNSlide.check_n_swap(x, y, target, black);
-            ClickNSlide.check_win();
-        },
-        _wheel: function (e) {
-            if (ClickNSlide.anim_counter == 0) {
-                if (e.deltaY < 0 && ClickNSlide.img_index != ClickNSlide.imgs.length) { ClickNSlide.slider_anim(1), ClickNSlide.img_index++ }
-                else if (e.deltaY > 0 && ClickNSlide.img_index != 0) { ClickNSlide.slider_anim(2), ClickNSlide.img_index-- }
-            }
-        },
-        slider_loop: function () {
-            var target = document.getElementById("slidero");
-            var target_height = document.getElementsByClassName("imgs")[0].clientHeight;
-            if (ClickNSlide.img_index == ClickNSlide.imgs.length - 1) {
-                ClickNSlide.img_index = 1
-                target.scrollTop = target_height;
-            }
-            else if (ClickNSlide.img_index == 0) {
-                ClickNSlide.img_index = ClickNSlide.imgs.length - 2;
-                target.scrollTop = target_height * (parseInt(ClickNSlide.imgs.length) - 2) + 3;
-            }
-            ClickNSlide.change_img()
-        },
-        slider_anim: function (y) {
-            var target_height = document.getElementsByClassName("imgs")[0].clientHeight;
-            if (ClickNSlide.anim_counter <= target_height) {
-                ClickNSlide.anim_counter++
-                setTimeout(function () {
-                    ClickNSlide.animate(y, target_height);
-                }, 2)
-            } else {
-                ClickNSlide.anim_counter = 0;
-                ClickNSlide.slider_loop();
-                ClickNSlide.change_img();
-            }
-        },
-        animate: function (y, h) {
-            var target = document.getElementById("slidero");
-            if (y == 1) target.scrollTop += 1;
-            if (y == 2) target.scrollTop -= 1;
-            ClickNSlide.slider_anim(y)
-        },
-        change_img: function () {
-            var tds = document.getElementsByClassName("td")
-            for (var i = 0; i < tds.length; i++) {
-                if (tds[i] != document.getElementsByClassName("blck")[0]) {
-                    tds[i].style.backgroundImage = "url(" + ClickNSlide.imgs[ClickNSlide.img_index] + ")";
-                }
-            }
-        },
-        check: function (x, y, target) {
-            var x1 = x + 1, x2 = x - 1, y1 = y + 1, y2 = y - 1
-            if (ClickNSlide.array[x2][y] == 1) { target.setAttribute("id", "c" + (x2) + "." + (y)); return true; }
-            else if (ClickNSlide.array[x1][y] == 1) { target.setAttribute("id", "c" + (x1) + "." + (y)); return true; }
-            else if (ClickNSlide.array[x][y2] == 1) { target.setAttribute("id", "c" + (x) + "." + (y2)); return true; }
-            else if (ClickNSlide.array[x][y1] == 1) { target.setAttribute("id", "c" + (x) + "." + (y1)); return true; } else return false;
-        },
-        swap: function (obj1, obj2) {
-            var temp = document.createElement("div");
-            obj1.parentNode.insertBefore(temp, obj1);
-            obj2.parentNode.insertBefore(obj1, obj2);
-            temp.parentNode.insertBefore(obj2, temp);
-            temp.parentNode.removeChild(temp);
-        },
-        check_n_swap: function (x, y, target, black) {
-            if (ClickNSlide.check(x, y, target, black)) {
-                ClickNSlide.array = ClickNSlide.genTab(parseInt(ClickNSlide.thevalue) + 2);
-                ClickNSlide.array[x][y] = 1;
-                black.setAttribute("id", "c" + x + "." + y);
-                ClickNSlide.swap(target, black);
-                ClickNSlide.update_stepper();
-            }
-        },
-        clear_timer: function () {
-            var timers = document.getElementsByClassName("timer");
-            for (var i = 0; i < timers.length; i++) { timers[i].style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")"; };
-            ClickNSlide.time = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-        },
-        clear_stepper: function () {
-            var steppers = document.getElementsByClassName("stepper")
-            for (var i = 0; i < steppers.length; i++) { steppers[i].style.backgroundImage = "url(" + ClickNSlide.numbers[0] + ")"; };
-            ClickNSlide.player_turns = [0, 0, 0, 0];
-        },
-        update_stepper: function () {
-            var zegar = document.getElementsByClassName("stepper")
-            ClickNSlide.player_turns[3]++
-            for (var i = zegar.length - 1; i >= 0; i--) {
-                if (ClickNSlide.player_turns[i] > 9) ClickNSlide.player_turns[i - 1]++ , ClickNSlide.player_turns[i] = 0;
-                zegar[i].style.backgroundImage = "url(" + ClickNSlide.numbers[ClickNSlide.player_turns[i]] + ")"
-            }
-        },
-        step: function (last_move) {
-            let black = document.getElementsByClassName("blck")[0];
-            let bid = black.getAttribute("id");
-            var x = parseInt(bid[1]), y = parseInt(bid[3]);
-            directions = ClickNSlide.rollmove(x, y);
-            if (directions["x"] == last_move["x"] && directions["y"] == last_move["y"]) {
-                ClickNSlide.step(last_move)
-            } else {
-                var target = document.getElementById("c" + (directions['x']) + "." + (directions['y']))
-                if (target == null || target == black) {
-                    ClickNSlide.step(last_move)
-                }
-                else {
-                    target.setAttribute("id", "c" + (x) + "." + (y))
-                    black.setAttribute("id", "c" + (directions['x']) + "." + (directions['y']))
-                    ClickNSlide.swap(target, black);
-                    ClickNSlide.last_move = { "x": x, "y": y };
-                }
-            }
-        },
-        rollmove: function (x, y) {
-            var direction_1 = Math.round(Math.random())
-            var direction_2 = Math.round(Math.random())
-            if (direction_1 == 1) {
-                if (direction_2 == 1) { x = x + 1; } else { x = x - 1; }
-            } else { if (direction_2 == 1) { y = y + 1; } else { y = y - 1; } }
-            return { "x": x, "y": y }
-        },
-        last_move: { "x": 0, "y": 0 },
-        rollboard: function () {
-            var steps = ClickNSlide.thevalue * ClickNSlide.thevalue * 10;
-            if (ClickNSlide.step_counter < steps) {
-                ClickNSlide.roll_in_progress = true
-                setTimeout(function () {
-                    ClickNSlide.step(ClickNSlide.last_move)
-                    ClickNSlide.rollboard()
-                    ClickNSlide.step_counter++
-                }, 10)
-            } else {
-                ClickNSlide.setBlck()
-                ClickNSlide.roll_in_progress = false
-                ClickNSlide.start()
-            }
-        },
-        setBlck: function () {
-            let blck = document.getElementsByClassName("blck")[0];
-            let bid = blck.getAttribute("id");
-            let x = bid[1];
-            let y = bid[3];
-            ClickNSlide.array[x][y] = 1;
-        },
-        start: function () {
-            ClickNSlide.startDate = Date.now()
-            var tds = document.getElementsByClassName("td")
-            var length = tds.length
-            ClickNSlide.time = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-            ClickNSlide.upd = setInterval(function () { ClickNSlide.update() }, 1)
-            for (var i = 0; i < length; i++) {
-                tds[i].addEventListener("click", ClickNSlide._clicktab, true);
-            }
-        },
-        update: function () {
-            var now = Date.now()
-            var elapsed = now - ClickNSlide.startDate
-            var tmsec = ClickNSlide.time[7] * 10;
-            var hmsec = ClickNSlide.time[6] * 100;
-            var sec = ClickNSlide.time[5] * 1000;
-            var tsec = ClickNSlide.time[4] * 10000;
-            var min = ClickNSlide.time[3] * 60000;
-            var tmin = ClickNSlide.time[2] * 600000;
-            var hrs = ClickNSlide.time[1] * 60 * 60 * 1000;
-            var thrs = ClickNSlide.time[0] * 10 * 60 * 60 * 1000;
-            var elapsed = elapsed - tmsec - hmsec - sec - tsec - min - tmin - hrs - thrs;
-            ClickNSlide.time[8] = elapsed
-            var zegar = document.getElementsByClassName("timer")
-            for (var i = zegar.length - 1; i >= 0; i--) {
-                if (i == 4 || i == 2 || i == 0) {
-                    if (ClickNSlide.time[i] > 5) ClickNSlide.time[i - 1]++ , ClickNSlide.time[i] = ClickNSlide.time[i] - 6;
-                    if (i == 0 && ClickNSlide.time[i] > 6) alert("KONIEC CZASU"), ClickNSlide.stop();
-                } else {
-                    if (ClickNSlide.time[i] > 9) ClickNSlide.time[i - 1]++ , ClickNSlide.time[i] = 0;
-                }
-                zegar[i].style.backgroundImage = "url(" + ClickNSlide.numbers[ClickNSlide.time[i]] + ")"
-            }
-        },
-        gen_win_string: function (tds) {
-            var length = tds.length;
-            var string = "";
-            for (var i = 0; i < length; i++) {
-                var x = tds[i].className
-                string += x
-            }
-            return string;
-        },
-        check_win: function () {
-            var tds = document.getElementsByClassName("td")
-            var player_string = ClickNSlide.gen_win_string(tds)
-            if (player_string == ClickNSlide.win_string) {
-                ClickNSlide.endGame()
-            }
-        },
-        stop: function () {
-            clearInterval(ClickNSlide.upd)
-        },
-        gen_wintime: function () {
-            var wintime = "";
-            for (var i = 0; i < 9; i++) {
-                wintime += ClickNSlide.time[i].toString();
-                if (i == 1 || i == 3 || i == 5) wintime += ":";
-            }
-            return wintime;
-        },
-        gen_winsteps: function () {
-            var winsteps = "";
-            for (var i = 0; i < 4; i++) {
-                if (!ClickNSlide.player_turns[i] == 0) winsteps += ClickNSlide.player_turns[i].toString();
-                else winsteps += 0;
-            }
-            return winsteps;
-        },
-        alertGen: function () {
-            let alertbackground = document.createElement("div")
-            let alertinner = document.createElement("div")
-            alertbackground.setAttribute("id", "alert")
-            alertinner.setAttribute("id", "inneralert")
-            document.body.appendChild(alertbackground)
-            document.body.appendChild(alertinner)
-            return [alertbackground, alertinner]
-        },
-        winalertGen: function (x) {
-            let p = document.createElement("p")
-            let p2 = document.createElement("p")
-            let p3 = document.createElement("p")
-            p.classList.add("p")
-            p2.classList.add("p2")
-            p3.classList.add("p2")
-            p.innerText = "Zwycięstwo!"
-            p2.innerText = "Ilość ruchów: " + ClickNSlide.gen_winsteps();
-            p3.innerText = "Twój czas: " + ClickNSlide.gen_wintime();
-            x[1].appendChild(p)
-            x[1].appendChild(p2)
-            x[1].appendChild(p3)
-        },
-        clearbuttonGen: function (x) {
-            let bok = document.createElement("button")
-            x[1].appendChild(bok)
-            bok.classList.add("b")
-            bok.innerText = "OK"
-            bok.addEventListener("click", function () {
-                bok.remove()
-                x[1].remove()
-                x[0].remove()
-            })
-        },
-        escapeClear: function () {
-            document.getElementById("alert").remove()
-            document.getElementById("inneralert").remove()
-        },
-        createCookie: function () {
-            document.cookie =
-                "id" + ClickNSlide.startDate + "="
-                + ClickNSlide.thevalue
-                + "|" + ClickNSlide.gen_wintime()
-                + "|" + ClickNSlide.gen_winsteps() + ";"
-                + "expires=Thu, 21 Mar 2137 12:00:00 UTC";
-            console.log(document.cookie)
-        },
-        endGame: function () {
-            ClickNSlide.createCookie();
-            ClickNSlide.stop();
-            ClickNSlide.rem_listeners();
-            var x = ClickNSlide.alertGen();
-            ClickNSlide.winalertGen(x);
-            ClickNSlide.clearbuttonGen(x);
-        },
-        rem_listeners: function () {
-            var tds = document.getElementsByClassName("td")
-            var length = tds.length
-            for (var i = 0; i < length; i++) {
-                tds[i].removeEventListener("click", ClickNSlide._clicktab, true);
-            }
-        },
-    }
-    ClickNSlide.genHtml()
-</script>
-
+            row.appendChild(td);
+          }
+          table.appendChild(row);
+        }
+        target.appendChild(table);
+      },
+      __contextmenu: function (e) {
+        e.preventDefault();
+      },
+      _clicktab: function (e) {
+        let target = e.target;
+        let black = document.getElementsByClassName("blck")[0];
+        let tid = target.getAttribute("id");
+        let x = parseInt(tid[1]);
+        let y = parseInt(tid[3]);
+        ClickNSlide.check_n_swap(x, y, target, black);
+        ClickNSlide.check_win();
+      },
+      _wheel: function (e) {
+        if (ClickNSlide.anim_counter == 0) {
+          if (
+            e.deltaY < 0 &&
+            ClickNSlide.img_index != ClickNSlide.imgs.length
+          ) {
+            ClickNSlide.slider_anim(1), ClickNSlide.img_index++;
+          } else if (e.deltaY > 0 && ClickNSlide.img_index != 0) {
+            ClickNSlide.slider_anim(2), ClickNSlide.img_index--;
+          }
+        }
+      },
+      slider_loop: function () {
+        var target = document.getElementById("slidero");
+        var target_height =
+          document.getElementsByClassName("imgs")[0].clientHeight;
+        if (ClickNSlide.img_index == ClickNSlide.imgs.length - 1) {
+          ClickNSlide.img_index = 1;
+          target.scrollTop = target_height;
+        } else if (ClickNSlide.img_index == 0) {
+          ClickNSlide.img_index = ClickNSlide.imgs.length - 2;
+          target.scrollTop =
+            target_height * (parseInt(ClickNSlide.imgs.length) - 2) + 3;
+        }
+        ClickNSlide.change_img();
+      },
+      slider_anim: function (y) {
+        var target_height =
+          document.getElementsByClassName("imgs")[0].clientHeight;
+        if (ClickNSlide.anim_counter <= target_height) {
+          ClickNSlide.anim_counter++;
+          setTimeout(function () {
+            ClickNSlide.animate(y, target_height);
+          }, 2);
+        } else {
+          ClickNSlide.anim_counter = 0;
+          ClickNSlide.slider_loop();
+          ClickNSlide.change_img();
+        }
+      },
+      animate: function (y, h) {
+        var target = document.getElementById("slidero");
+        if (y == 1) target.scrollTop += 1;
+        if (y == 2) target.scrollTop -= 1;
+        ClickNSlide.slider_anim(y);
+      },
+      change_img: function () {
+        var tds = document.getElementsByClassName("td");
+        for (var i = 0; i < tds.length; i++) {
+          if (tds[i] != document.getElementsByClassName("blck")[0]) {
+            tds[i].style.backgroundImage =
+              "url(" + ClickNSlide.imgs[ClickNSlide.img_index] + ")";
+          }
+        }
+      },
+      check: function (x, y, target) {
+        var x1 = x + 1,
+          x2 = x - 1,
+          y1 = y + 1,
+          y2 = y - 1;
+        if (ClickNSlide.array[x2][y] == 1) {
+          target.setAttribute("id", "c" + x2 + "." + y);
+          return true;
+        } else if (ClickNSlide.array[x1][y] == 1) {
+          target.setAttribute("id", "c" + x1 + "." + y);
+          return true;
+        } else if (ClickNSlide.array[x][y2] == 1) {
+          target.setAttribute("id", "c" + x + "." + y2);
+          return true;
+        } else if (ClickNSlide.array[x][y1] == 1) {
+          target.setAttribute("id", "c" + x + "." + y1);
+          return true;
+        } else return false;
+      },
+      swap: function (obj1, obj2) {
+        var temp = document.createElement("div");
+        obj1.parentNode.insertBefore(temp, obj1);
+        obj2.parentNode.insertBefore(obj1, obj2);
+        temp.parentNode.insertBefore(obj2, temp);
+        temp.parentNode.removeChild(temp);
+      },
+      check_n_swap: function (x, y, target, black) {
+        if (ClickNSlide.check(x, y, target, black)) {
+          ClickNSlide.array = ClickNSlide.genTab(
+            parseInt(ClickNSlide.thevalue) + 2
+          );
+          ClickNSlide.array[x][y] = 1;
+          black.setAttribute("id", "c" + x + "." + y);
+          ClickNSlide.swap(target, black);
+          ClickNSlide.update_stepper();
+        }
+      },
+      clear_timer: function () {
+        var timers = document.getElementsByClassName("timer");
+        for (var i = 0; i < timers.length; i++) {
+          timers[i].style.backgroundImage =
+            "url(" + ClickNSlide.numbers[0] + ")";
+        }
+        ClickNSlide.time = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+      },
+      clear_stepper: function () {
+        var steppers = document.getElementsByClassName("stepper");
+        for (var i = 0; i < steppers.length; i++) {
+          steppers[i].style.backgroundImage =
+            "url(" + ClickNSlide.numbers[0] + ")";
+        }
+        ClickNSlide.player_turns = [0, 0, 0, 0];
+      },
+      update_stepper: function () {
+        var zegar = document.getElementsByClassName("stepper");
+        ClickNSlide.player_turns[3]++;
+        for (var i = zegar.length - 1; i >= 0; i--) {
+          if (ClickNSlide.player_turns[i] > 9)
+            ClickNSlide.player_turns[i - 1]++,
+              (ClickNSlide.player_turns[i] = 0);
+          zegar[i].style.backgroundImage =
+            "url(" + ClickNSlide.numbers[ClickNSlide.player_turns[i]] + ")";
+        }
+      },
+      step: function (last_move) {
+        let black = document.getElementsByClassName("blck")[0];
+        let bid = black.getAttribute("id");
+        var x = parseInt(bid[1]),
+          y = parseInt(bid[3]);
+        directions = ClickNSlide.rollmove(x, y);
+        if (
+          directions["x"] == last_move["x"] &&
+          directions["y"] == last_move["y"]
+        ) {
+          ClickNSlide.step(last_move);
+        } else {
+          var target = document.getElementById(
+            "c" + directions["x"] + "." + directions["y"]
+          );
+          if (target == null || target == black) {
+            ClickNSlide.step(last_move);
+          } else {
+            target.setAttribute("id", "c" + x + "." + y);
+            black.setAttribute(
+              "id",
+              "c" + directions["x"] + "." + directions["y"]
+            );
+            ClickNSlide.swap(target, black);
+            ClickNSlide.last_move = { x: x, y: y };
+          }
+        }
+      },
+      rollmove: function (x, y) {
+        var direction_1 = Math.round(Math.random());
+        var direction_2 = Math.round(Math.random());
+        if (direction_1 == 1) {
+          if (direction_2 == 1) {
+            x = x + 1;
+          } else {
+            x = x - 1;
+          }
+        } else {
+          if (direction_2 == 1) {
+            y = y + 1;
+          } else {
+            y = y - 1;
+          }
+        }
+        return { x: x, y: y };
+      },
+      last_move: { x: 0, y: 0 },
+      rollboard: function () {
+        var steps = ClickNSlide.thevalue * ClickNSlide.thevalue * 10;
+        if (ClickNSlide.step_counter < steps) {
+          ClickNSlide.roll_in_progress = true;
+          setTimeout(function () {
+            ClickNSlide.step(ClickNSlide.last_move);
+            ClickNSlide.rollboard();
+            ClickNSlide.step_counter++;
+          }, 10);
+        } else {
+          ClickNSlide.setBlck();
+          ClickNSlide.roll_in_progress = false;
+          ClickNSlide.start();
+        }
+      },
+      setBlck: function () {
+        let blck = document.getElementsByClassName("blck")[0];
+        let bid = blck.getAttribute("id");
+        let x = bid[1];
+        let y = bid[3];
+        ClickNSlide.array[x][y] = 1;
+      },
+      start: function () {
+        ClickNSlide.startDate = Date.now();
+        var tds = document.getElementsByClassName("td");
+        var length = tds.length;
+        ClickNSlide.time = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+        ClickNSlide.upd = setInterval(function () {
+          ClickNSlide.update();
+        }, 1);
+        for (var i = 0; i < length; i++) {
+          tds[i].addEventListener("click", ClickNSlide._clicktab, true);
+        }
+      },
+      update: function () {
+        var now = Date.now();
+        var elapsed = now - ClickNSlide.startDate;
+        var tmsec = ClickNSlide.time[7] * 10;
+        var hmsec = ClickNSlide.time[6] * 100;
+        var sec = ClickNSlide.time[5] * 1000;
+        var tsec = ClickNSlide.time[4] * 10000;
+        var min = ClickNSlide.time[3] * 60000;
+        var tmin = ClickNSlide.time[2] * 600000;
+        var hrs = ClickNSlide.time[1] * 60 * 60 * 1000;
+        var thrs = ClickNSlide.time[0] * 10 * 60 * 60 * 1000;
+        var elapsed =
+          elapsed - tmsec - hmsec - sec - tsec - min - tmin - hrs - thrs;
+        ClickNSlide.time[8] = elapsed;
+        var zegar = document.getElementsByClassName("timer");
+        for (var i = zegar.length - 1; i >= 0; i--) {
+          if (i == 4 || i == 2 || i == 0) {
+            if (ClickNSlide.time[i] > 5)
+              ClickNSlide.time[i - 1]++,
+                (ClickNSlide.time[i] = ClickNSlide.time[i] - 6);
+            if (i == 0 && ClickNSlide.time[i] > 6)
+              alert("KONIEC CZASU"), ClickNSlide.stop();
+          } else {
+            if (ClickNSlide.time[i] > 9)
+              ClickNSlide.time[i - 1]++, (ClickNSlide.time[i] = 0);
+          }
+          zegar[i].style.backgroundImage =
+            "url(" + ClickNSlide.numbers[ClickNSlide.time[i]] + ")";
+        }
+      },
+      gen_win_string: function (tds) {
+        var length = tds.length;
+        var string = "";
+        for (var i = 0; i < length; i++) {
+          var x = tds[i].className;
+          string += x;
+        }
+        return string;
+      },
+      check_win: function () {
+        var tds = document.getElementsByClassName("td");
+        var player_string = ClickNSlide.gen_win_string(tds);
+        if (player_string == ClickNSlide.win_string) {
+          ClickNSlide.endGame();
+        }
+      },
+      stop: function () {
+        clearInterval(ClickNSlide.upd);
+      },
+      gen_wintime: function () {
+        var wintime = "";
+        for (var i = 0; i < 9; i++) {
+          wintime += ClickNSlide.time[i].toString();
+          if (i == 1 || i == 3 || i == 5) wintime += ":";
+        }
+        return wintime;
+      },
+      gen_winsteps: function () {
+        var winsteps = "";
+        for (var i = 0; i < 4; i++) {
+          if (!ClickNSlide.player_turns[i] == 0)
+            winsteps += ClickNSlide.player_turns[i].toString();
+          else winsteps += 0;
+        }
+        return winsteps;
+      },
+      alertGen: function () {
+        let alertbackground = document.createElement("div");
+        let alertinner = document.createElement("div");
+        alertbackground.setAttribute("id", "alert");
+        alertinner.setAttribute("id", "inneralert");
+        document.body.appendChild(alertbackground);
+        document.body.appendChild(alertinner);
+        return [alertbackground, alertinner];
+      },
+      winalertGen: function (x) {
+        let p = document.createElement("p");
+        let p2 = document.createElement("p");
+        let p3 = document.createElement("p");
+        p.classList.add("p");
+        p2.classList.add("p2");
+        p3.classList.add("p2");
+        p.innerText = "Zwycięstwo!";
+        p2.innerText = "Ilość ruchów: " + ClickNSlide.gen_winsteps();
+        p3.innerText = "Twój czas: " + ClickNSlide.gen_wintime();
+        x[1].appendChild(p);
+        x[1].appendChild(p2);
+        x[1].appendChild(p3);
+      },
+      clearbuttonGen: function (x) {
+        let bok = document.createElement("button");
+        x[1].appendChild(bok);
+        bok.classList.add("b");
+        bok.innerText = "OK";
+        bok.addEventListener("click", function () {
+          bok.remove();
+          x[1].remove();
+          x[0].remove();
+        });
+      },
+      escapeClear: function () {
+        document.getElementById("alert").remove();
+        document.getElementById("inneralert").remove();
+      },
+      createCookie: function () {
+        document.cookie =
+          "id" +
+          ClickNSlide.startDate +
+          "=" +
+          ClickNSlide.thevalue +
+          "|" +
+          ClickNSlide.gen_wintime() +
+          "|" +
+          ClickNSlide.gen_winsteps() +
+          ";" +
+          "expires=Thu, 21 Mar 2137 12:00:00 UTC";
+        console.log(document.cookie);
+      },
+      endGame: function () {
+        ClickNSlide.createCookie();
+        ClickNSlide.stop();
+        ClickNSlide.rem_listeners();
+        var x = ClickNSlide.alertGen();
+        ClickNSlide.winalertGen(x);
+        ClickNSlide.clearbuttonGen(x);
+      },
+      rem_listeners: function () {
+        var tds = document.getElementsByClassName("td");
+        var length = tds.length;
+        for (var i = 0; i < length; i++) {
+          tds[i].removeEventListener("click", ClickNSlide._clicktab, true);
+        }
+      },
+    };
+    ClickNSlide.genHtml();
+  </script>
 </html>
